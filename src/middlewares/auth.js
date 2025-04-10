@@ -1,12 +1,25 @@
-const adminauth = (req, res, next) => {
-    console.log("admin auth");
-    const token = "abced";
-    const verify = "abcd";
-    if (token === verify) {
-        next();
-    } else {
-        res.status(401).send("unauthorized access");
-    }
+const jwt = require('jsonwebtoken');
+const User= require("../models/user");
+
+const userAuthentication = async (req, res, next) => {
+  try{
+      //read the token
+      const {token }=req.cookies;
+      if(!token){
+        throw new Error ("something went wrong");
+      }
+      const  decodedObj= await jwt.verify(token,'Devconnect');
+const {_id}= decodedObj;
+
+const user= await User.findOne({_id:_id});
+if(!user){
+  throw new Error("user not found:"+err.message);
+}
+req.user=user;
+next();
+  }catch (err){
+    res.status(400).send("ERROR"+err.message);
+  }
 };
 
-module.exports = { adminauth };
+module.exports =  {userAuthentication };
