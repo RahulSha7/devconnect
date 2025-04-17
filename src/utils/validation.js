@@ -14,4 +14,14 @@ const signupValidation= (req)=>{
                 }           
    
 }
-module.exports=signupValidation;
+
+const allowedProfileUpdate = (req)=>{
+    const allowedUpdate = ["firstName","lastName","age","gender","skills","photoUrl"];
+    const isUpdateAllowed = Object.keys(req.body).every(field => allowedUpdate.includes(field));
+    // if(!isAllowedUpdate){
+    //     res.status(400).send("please enter only valid fields")
+    // }
+    return isUpdateAllowed;
+
+}
+module.exports={signupValidation,allowedProfileUpdate};

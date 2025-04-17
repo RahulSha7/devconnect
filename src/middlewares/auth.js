@@ -8,7 +8,7 @@ const userAuthentication = async (req, res, next) => {
       if(!token){
         throw new Error ("something went wrong");
       }
-      const  decodedObj= await jwt.verify(token,'Devconnect');
+      const  decodedObj= await jwt.verify(token,'Rahul@123');
 const {_id}= decodedObj;
 
 const user= await User.findOne({_id:_id});
