@@ -41,7 +41,7 @@ router.post("/request/send/:status/:toUserId", userAuthentication, async (req, r
      
      );
   }catch (err) {
-    console.log("ERROR SENDING REQUEST:", err.message); // ← ADD THIS
+
     res.status(400).json({ error: err.message });
   }
 });
@@ -60,6 +60,7 @@ router.post("/request/review/:status/:requestId",userAuthentication,async (req,r
       toUserId:user._id,
       status:"interested"
       })
+      console.log(connectionRequest);
       if(!connectionRequest) return res.status(400).json({error:"user not found"});
 
       connectionRequest.status=status;
