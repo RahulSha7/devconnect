@@ -33,17 +33,20 @@ router.post("/login", async (req, res) => {
     try {
       //validate
       const { email, password } = req.body;
-      if (!validator.isEmail(email)) throw new Error("insert correct email");
+      if (!validator.isEmail(email)) {
+        throw new Error("insert correct email")
+      }
       const user = await User.findOne({ email });
       if (!user) {
         throw new Error("Invalid Credentials");
+        
       }
       const comparePassword = await user.validatePassword(password);
       if (comparePassword) {
         const token = await user.getJWT();
   
         res.cookie("token", token);
-        res.send("login succesfull");
+        res.json({data:user});
       } else {
         res.status(400).send("Invalid Credentials");
       }

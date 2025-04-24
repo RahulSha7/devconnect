@@ -56,31 +56,26 @@ router.get('/user/feed',userAuthentication,async(req,res)=>{
 user= req.user;
 const page= parseInt(req.query.page)||1;
 let limit = parseInt(req.query.limit)||10;
-limit= limit >50 ? 50:limit;
-skip = (page-1)*10;
+limit = Math.min(limit, 50);
+skip = (page-1)*limit;
 
 const connectionRequests = await ConnectionModel.find({
    $or:[
     { fromUserId:user._id},
-    {toUserId:user._id, status:"accepted"},
-    {toUserId:user._id,status:"rejected"},
-    {toUserId:user._id,status:"interested"},
+    {toUserId:user._id}
 
    ],
 }).select("fromUserId toUserId");
 
-const hiddenUsers= new Set();
+const hiddenUsers = new Set([user._id]);
 
-connectionRequests.forEach(req=>{
-    hiddenUsers.add(req.fromUserId)
-    hiddenUsers.add(req.toUserId)
-})
+connectionRequests.forEach(r => {
+  hiddenUsers.add(r.fromUserId);
+  hiddenUsers.add(r.toUserId);
+});
 
 const feedUsers = await User.find({
-  $and:[
-    {_id:{  $nin: Array.from(hiddenUsers) }},
-  {_id:  {$ne:user._id}}
-  ]
+  _id: { $nin: [...hiddenUsers] }   
 })
 .select(USER_DATA)
 .skip(skip)
