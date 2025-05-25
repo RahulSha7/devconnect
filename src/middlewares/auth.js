@@ -6,7 +6,7 @@ const userAuthentication = async (req, res, next) => {
       //read the token
       const {token }=req.cookies;
       if(!token){
-        throw new Error ("something went wrong");
+        return res.status(401).send("Unauthorized: No token provided");
       }
       const  decodedObj= await jwt.verify(token,'Rahul@123');
 const {_id}= decodedObj;
