@@ -1,27 +1,36 @@
-const validator = require('validator');
+const validator = require("validator");
 
-const signupValidation= (req)=>{
-    const {firstName,lastName,email,password}=req.body;
-    if(!firstName || !lastName){
-        throw new Error("name is required");
-    }
-   else if(!validator.isEmail(email)){
-                    throw new Error("email not valid");
-                }
-                
-  else if(!validator.isStrongPassword(password)){
-                    throw new Error("password  not strong");
-                }           
-   
-}
+const validateSignUpData = (req) => {
+  const { firstName, lastName, emailId, password } = req.body;
+  if (!firstName || !lastName) {
+    throw new Error("Name is not valid!");
+  } else if (!validator.isEmail(emailId)) {
+    throw new Error("Email is not valid!");
+  } else if (!validator.isStrongPassword(password)) {
+    throw new Error("Please enter a strong Password!");
+  }
+};
 
-const allowedProfileUpdate = (req)=>{
-    const allowedUpdate = ["firstName","lastName","age","gender","skills","photoUrl"];
-    const isUpdateAllowed = Object.keys(req.body).every(field => allowedUpdate.includes(field));
-    // if(!isAllowedUpdate){
-    //     res.status(400).send("please enter only valid fields")
-    // }
-    return isUpdateAllowed;
+const validateEditProfileData = (req) => {
+  const allowedEditFields = [
+    "firstName",
+    "lastName",
+    "emailId",
+    "photoUrl",
+    "gender",
+    "age",
+    "about",
+    "skills",
+  ];
 
-}
-module.exports={signupValidation,allowedProfileUpdate};
+  const isEditAllowed = Object.keys(req.body).every((field) =>
+    allowedEditFields.includes(field)
+  );
+
+  return isEditAllowed;
+};
+
+module.exports = {
+  validateSignUpData,
+  validateEditProfileData,
+};

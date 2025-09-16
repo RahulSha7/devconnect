@@ -1,65 +1,72 @@
-const express = require('express');
-const {signupValidation} = require("../utils/validation");
-const bcrypt = require("bcrypt");
-const validator = require("validator");
+const express = require("express");
+const authRouter = express.Router();
+
+const { validateSignUpData } = require("../utils/validation");
 const User = require("../models/user");
+const bcrypt = require("bcrypt");
 
-const router = express.Router();
-
-router.post("/signup", async (req, res) => {
+authRouter.post("/signup", async (req, res) => {
   try {
-    //validating
-    signupValidation(req);
-    //password hash
-    const { firstName, lastName, email, password } = req.body;
-    const hashPassword = await bcrypt.hash(password, 10);
+    // Validation of data
+    validateSignUpData(req);
 
-    // console.log(hashPassword);
+    const { firstName, lastName, emailId, password } = req.body;
+
+    // Encrypt the password
+    const passwordHash = await bcrypt.hash(password, 10);
+    console.log(passwordHash);
+
+    //   Creating a new instance of the User model
     const user = new User({
       firstName,
       lastName,
-      email,
-      password: hashPassword,
+      emailId,
+      password: passwordHash,
     });
 
-    await user.save();
-    res.send("user saved");
+    const savedUser = await user.save();
+    const token = await savedUser.getJWT();
+
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 8 * 3600000),
+    });
+
+    res.json({ message: "User Added successfully!", data: savedUser });
   } catch (err) {
-    res.status(400).send("user getting error: " + err.message);
+    res.status(400).send("ERROR : " + err.message);
   }
 });
 
-router.post("/login", async (req, res) => {
-    try {
-      //validate
-      const { email, password } = req.body;
-      if (!validator.isEmail(email)) {
-        throw new Error("insert correct email")
-      }
-      const user = await User.findOne({ email });
-      if (!user) {
-        throw new Error("Invalid Credentials");
-        
-      }
-      const comparePassword = await user.validatePassword(password);
-      if (comparePassword) {
-        const token = await user.getJWT();
-  
-        res.cookie("token", token);
-        res.json({data:user});
-      } else {
-        res.status(400).send("Invalid Credentials");
-      }
-    } catch (err) {
-      res.status(400).send("Error in loging in:" + err.message);
+authRouter.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid credentials");
     }
+    const isPasswordValid = await user.validatePassword(password);
+
+    if (isPasswordValid) {
+      const token = await user.getJWT();
+
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 8 * 3600000),
+      });
+      res.send(user);
+    } else {
+      throw new Error("Invalid credentials");
+    }
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
+  }
+});
+
+authRouter.post("/logout", async (req, res) => {
+  res.cookie("token", null, {
+    expires: new Date(Date.now()),
   });
+  res.send("Logout Successful!!");
+});
 
-router.post("/logout",(req,res)=>{
-    res
-    .cookie("token",null,{expires: new Date(Date.now())})
-    .send("logout successful");
-
-  })
-
-module.exports= router;
+module.exports = authRouter;
