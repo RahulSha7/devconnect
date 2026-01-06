@@ -12,7 +12,7 @@
 // paymentRouter.post("/payment/create", userAuth, async (req, res) => {
 //   try {
 //     const { membershipType } = req.body;
-//     const { firstName, lastName, emailId } = req.user;
+//     const { firstName, lastName, email } = req.user;
 
 //     const order = await razorpayInstance.orders.create({
 //       amount: membershipAmount[membershipType] * 100,
@@ -21,7 +21,7 @@
 //       notes: {
 //         firstName,
 //         lastName,
-//         emailId,
+//         email,
 //         membershipType: membershipType,
 //       },
 //     });

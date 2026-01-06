@@ -28,7 +28,7 @@
 //       try {
 //         const res = await sendEmail.run(
 //           "New Friend Requests pending for " + email,
-//           "Ther eare so many frined reuests pending, please login to DevConnect.in and accept or reject the reqyests."
+//           "Ther eare so many frined reuests pending, please login to devconnect4u.in and accept or reject the reqyests."
 //         );
 //         console.log(res);
 //       } catch (err) {

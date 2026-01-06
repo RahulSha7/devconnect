@@ -10,10 +10,15 @@ require("dotenv").config();
 require("./utils/cronjob");
 
 app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
+ cors({
+  origin: [
+    "http://localhost:5173",
+    "http://13.60.94.19",
+    "https://devconnect4u.in"
+  ],
+  credentials: true,
+})
+
 );
 app.use(express.json());
 app.use(cookieParser());
